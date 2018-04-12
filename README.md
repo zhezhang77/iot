@@ -11,7 +11,7 @@
     iot/button/client_id          (GrovePi+/SenseHat)
     iot/rotary/client_id          (GrovePi+)
     iot/pressure/client_id        (SenseHat)
-    iot/magnetometer/client_id    (SenseHat)
+    iot/compass/client_id         (SenseHat)
   ```
 * iot_sub.py  
   + Subscribe to above topics to receive data  
