@@ -3,7 +3,8 @@
 
 # Program
 * iot_pub.py  
-  + Publish temperature and humidity data to AWS broker.  
+  + Publish sensor data to AWS broker.  
+  + Press Ctrl+C on console to exit the program
   + **Topic:** 
   ```c
     iot/temperature/client_id     (GrovePi+/SenseHat)
@@ -12,12 +13,13 @@
     iot/rotary/client_id          (GrovePi+)
     iot/pressure/client_id        (SenseHat)
     iot/compass/client_id         (SenseHat)
+    ...
   ```
   
 * iot_sub.py  
-  + Subscribe to above topics to receive data  
-  + Press joystick **left/right** to switch info
-  + Press joystick **up/down** to exit the program
+  + Subscribe to iot/+/<display id> to receive data from specific client
+  + Press joystick **up/down** to exit the program (SenseHat)
+  + Press Ctrl+C on console to exit the program
 
 # TLS certificates
 <html><table>
