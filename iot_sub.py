@@ -7,6 +7,7 @@ import paho.mqtt.client as mqtt
 import json
 import threading
 import re
+import signal
 
 from sense_hat import SenseHat
 
@@ -15,8 +16,13 @@ from grove_rgb_lcd import *
 
 config_file = 'iot_sub.conf'
 disp_data={}
+running = True
 
-
+def handle_exit(signal, frame):
+    global running
+    print 'Ctrl+C pressed'
+    running = False
+    
 def init():
     conf_str = open(config_file).read()
     return json.loads(conf_str)
@@ -86,6 +92,9 @@ def grove_display_info():
             time.sleep(0.1)
         
 def main():
+    global running
+    signal.signal(signal.SIGINT, handle_exit)
+    
     # Init
     conf = init()
 
@@ -115,7 +124,6 @@ def main():
 
     client.subscribe('iot/+/'+conf['display'])
 
-    running = True
     while running:
         client.loop()
 

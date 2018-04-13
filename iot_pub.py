@@ -5,15 +5,22 @@ import ssl
 import time
 import paho.mqtt.client as mqtt
 import json
+import signal
 
 from grovepi import *
 from sense_hat import SenseHat
 
 config_file = 'iot_pub.conf'
+running = True
 
+def handle_exit(signal, frame):
+    global running
+    print 'Ctrl+C pressed'
+    running = False
+    
 def init():
     conf_str = open(config_file).read()
-    print(conf_str)
+    #print(conf_str)
     return json.loads(conf_str)
 
 def sense_get_temperature(sense):
@@ -68,6 +75,10 @@ def publish(client, id, name, value):
     client.publish(gen_topic(id, name), gen_payload(id, name, value))
 
 def main():
+    global running
+    
+    signal.signal(signal.SIGINT, handle_exit)
+    
     # Init
     conf = init()
         
@@ -94,7 +105,6 @@ def main():
 	time.sleep(1)
 	
     #Publish
-    running = True
     while running:
         if (conf['type']=='sensehat'):
             time.sleep(1)
@@ -125,11 +135,8 @@ def main():
                 if (event.direction == 'middle') and (event.action == 'released'):
                     running = False
 
+    #Disconnect
     client.disconnect()
-    
-    # Release
-    if (conf['type']=='sensehat'):
-        sense.clear()
 
 if __name__ == '__main__':
     main()
