@@ -1,6 +1,12 @@
 # iot
 **IoT example (GrovePi+/SenseHat)**
 
+# Running
++ Use 'git clone' to get the whole folder to local
++ Run 'set_sense.sh' or 'set_grove.sh' accroding your Pi
++ Run 'iot_pub.py' to publish data
++ Run 'iot_sub.py' to subscribe and display data
+
 # Program
 * iot_pub.py  
   + Publish sensor data to AWS broker.  
