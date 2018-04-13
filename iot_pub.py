@@ -81,7 +81,7 @@ def main():
 
     client.on_connect = on_connect
     client.on_message = on_message
-    client.on_log = on_log #debug
+    #client.on_log = on_log #debug
 
     client.connect(conf['entrypoint'], conf['port'], 60)
         
@@ -118,7 +118,6 @@ def main():
             publish(client, conf['id'], "button",        repr(button))
             publish(client, conf['id'], "potentiometer", repr(potentiometer))
             
- 	    
  	# Control program exit
         if (conf['type']=='sensehat'):
             for event in eventList:

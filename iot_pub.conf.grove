@@ -7,7 +7,5 @@
   "dht_port": 7,
   "dht_type": 0,
   "button": 3,
-  "potentiometer": 0,
-  "lcd": 0,
-  "display": "66321288b3"
+  "potentiometer": 0
 }

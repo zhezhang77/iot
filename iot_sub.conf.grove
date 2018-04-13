@@ -4,10 +4,6 @@
   "id": "1a438b7092",
   "name": "grovepi_102",
   "type": "grovepi",
-  "dht_port": 7,
-  "dht_type": 0,
-  "botton": 3,
-  "potentiometer": 0,
   "lcd": 0,
   "display": "66321288b3"
 }

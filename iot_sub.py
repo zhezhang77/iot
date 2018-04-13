@@ -67,7 +67,7 @@ def sense_display_info(sense):
             sense.set_rotation(0)
 
         for [name, value] in disp_data.items():
-            sense.show_message(name+':'+value+' ', text_coloyr=[0,255,0])
+            sense.show_message(name+':'+value+' ', text_colour=[0,255,0])
 
         time.sleep(1)
 
@@ -83,7 +83,7 @@ def grove_display_info():
             disp_str = disp_str + " " + name + ':' + value
         for i in range(len(disp_str)):
             setText_norefresh(disp_str[i:])
-            time.sleep(0.5)
+            time.sleep(0.1)
         
 def main():
     # Init

@@ -3,6 +3,5 @@
   "port": 8883,
   "id": "66321288b3",
   "name": "sensehat_001",
-  "type": "sensehat",
-  "display": "66321288b3"
+  "type": "sensehat"
 }
