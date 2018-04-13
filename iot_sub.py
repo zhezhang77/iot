@@ -10,15 +10,12 @@ import re
 
 from sense_hat import SenseHat
 
-config_file = 'iot_sub.conf'
+from grovepi import *
+from grove_rgb_lcd import *
 
-disp_type = 0
-disp_type_max = 4
-temperature = "0"
-humidity = "0"
-button = "N/A"
-pressure = "0"
-compass = "0"
+config_file = 'iot_sub.conf'
+disp_data={}
+
 
 def init():
     conf_str = open(config_file).read()
@@ -26,11 +23,11 @@ def init():
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code "+str(rc))
+    print('Connected with result code '+str(rc))
 
 #
 def on_disconnect(client, userdata, rc):
-    print("Disconnected with result code "+str(rc))
+    print('Disconnected with result code '+str(rc))
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
@@ -39,34 +36,23 @@ def on_message(client, userdata, msg):
     global button
     global pressure
     global compass
+    global potentiometer
     
-    #print(msg.topic+" "+str(msg.payload))#debug
+    #print(msg.topic+' '+str(msg.payload))#debug
     data = json.loads(msg.payload)
     #print(data) #debug
 
     m = re.search(r'(?<=/)\w+', msg.topic) 
     
-    if m.group(0) == 'temperature':
-        temperature = data['temperature']
-    elif m.group(0) == 'humidity':
-        humidity = data['humidity']
-    elif m.group(0) == 'button':
-        button = data['button']
-    elif m.group(0) == 'pressure':
-        pressure = data['pressure']
-    elif m.group(0) == 'compass':
-        compass = data['compass']
-        
+    disp_data[m.group(0)] = data[m.group(0)]
+    
+# Helper function        
 def on_log(client, userdata, level, buf):
-    print("Debug %d: %s"%(level, buf))
+    print('Debug %d: %s'%(level, buf))
 
 def sense_display_info(sense):
-    global temperature
-    global humidity
-    global button
-    global pressure
-    global compass
-    
+    global disp_data
+
     while True:
         x, y, z = sense.get_accelerometer_raw().values()
         x = round(x, 0)
@@ -80,38 +66,43 @@ def sense_display_info(sense):
         else:
             sense.set_rotation(0)
 
-        if disp_type == 0:
-            sense.show_message("T:"+temperature, text_colour=[255, 0, 0])
-        elif disp_type == 1:
-            sense.show_message("H:"+humidity, text_colour=[0, 0, 255])
-        elif disp_type == 2:
-            sense.show_message("B:"+button, text_colour=[0, 255, 0])
-        elif disp_type == 3:
-            sense.show_message("P:"+pressure, text_colour=[255, 255, 0])
-        elif disp_type == 4:
-            sense.show_message("C:"+compass, text_colour=[255, 0, 255])
-        #else:
-        #    sense.clear()
+        for [name, value] in disp_data.items():
+            sense.show_message(name+':'+value+' ', text_coloyr=[0,255,0])
+
         time.sleep(1)
 
+def grove_display_info():
+    global disp_data
+    
+    setText('')
+    setRGB(0,255,0)
+    
+    while True:
+        disp_str = '>>>'
+        for [name, value] in disp_data.items():
+            disp_str = disp_str + " " + name + ':' + value
+        for i in range(len(disp_str)):
+            setText_norefresh(disp_str[i:])
+            time.sleep(0.5)
+        
 def main():
-    global disp_type
-
     # Init
     conf = init()
 
     if (conf['type']=='sensehat'):
         sense = SenseHat()
         disp_thread = threading.Thread(target=sense_display_info, args=(sense,))    
-    
+    elif (conf['type']=='grovepi'):
+        disp_thread = threading.Thread(target=grove_display_info)
+        
     disp_thread.daemon = True
     disp_thread.start()
 
     client = mqtt.Client(conf['id'])
 
-    client.tls_set( "./cert/CARoot.pem",
-                    "./cert/"+conf['id']+"-certificate.pem.crt",
-                    "./cert/"+conf['id']+"-private.pem.key",
+    client.tls_set( './cert/CARoot.pem',
+                    './cert/'+conf['id']+'-certificate.pem.crt',
+                    './cert/'+conf['id']+'-private.pem.key',
                     cert_reqs=ssl.CERT_NONE,
                     tls_version=ssl.PROTOCOL_TLSv1_2)	
 
@@ -122,7 +113,7 @@ def main():
 
     client.connect(conf['entrypoint'], conf['port'], 60)
 
-    client.subscribe("iot/+/"+conf['display'])
+    client.subscribe('iot/+/'+conf['display'])
 
     running = True
     while running:
@@ -132,15 +123,14 @@ def main():
             for event in sense.stick.get_events():
                 if ((event.direction == 'up') or (event.direction == 'down')) and (event.action == 'released'):
                     running = False
-                elif ((event.direction == 'left') or (event.direction == 'right')) and (event.action == 'released'):
-                    disp_type = disp_type + 1
-                    if (disp_type > disp_type_max):
-                        disp_type = 0
 
     client.disconnect()
     
     if (conf['type']=='sensehat'):
         sense.clear()
-
+    elif (conf['type']=='grovepi'):
+        setRGB(0,0,0)
+        setText('')
+        
 if __name__ == '__main__':
 	main()

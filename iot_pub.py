@@ -13,6 +13,7 @@ config_file = 'iot_pub.conf'
 
 def init():
     conf_str = open(config_file).read()
+    print(conf_str)
     return json.loads(conf_str)
 
 def sense_get_temperature(sense):
@@ -80,18 +81,23 @@ def main():
 
     client.on_connect = on_connect
     client.on_message = on_message
-    #client.on_log = on_log #debug
+    client.on_log = on_log #debug
 
     client.connect(conf['entrypoint'], conf['port'], 60)
         
     if (conf['type']=='sensehat'):
         sense = SenseHat()
         sense.set_imu_config(True, False, False) #Campass Only
-
+    elif (conf['type']=='grovepi'):
+        pinMode(conf['button'],"INPUT")
+	pinMode(conf['potentiometer'],"INPUT")
+	time.sleep(1)
+	
     #Publish
     running = True
     while running:
         if (conf['type']=='sensehat'):
+            time.sleep(1)
             publish(client, conf['id'], "temperature", repr(sense_get_temperature(sense)))
             publish(client, conf['id'], "humidity",    repr(sense_get_humidity(sense)))
             publish(client, conf['id'], "pressure",    repr(sense_get_pressure(sense)))
@@ -102,14 +108,23 @@ def main():
                 if (event.action == 'released'):
                     publish(client, conf['id'], "button", event.direction)
                     break
-                    
+        elif (conf['type']=='grovepi'):
+            [temp,hum] = dht(conf['dht_port'], conf['dht_type'])
+	    button = digitalRead(conf['button'])
+	    time.sleep(1)
+ 	    potentiometer = analogRead(conf['potentiometer'])
+ 	    publish(client, conf['id'], "temperature",   repr(temp))
+            publish(client, conf['id'], "humidity",      repr(hum))
+            publish(client, conf['id'], "button",        repr(button))
+            publish(client, conf['id'], "potentiometer", repr(potentiometer))
+            
+ 	    
+ 	# Control program exit
         if (conf['type']=='sensehat'):
             for event in eventList:
                 #print("Event: {} {}".format(event.action, event.direction)) #debug
                 if (event.direction == 'middle') and (event.action == 'released'):
                     running = False
-
-        time.sleep(1)
 
     client.disconnect()
     
