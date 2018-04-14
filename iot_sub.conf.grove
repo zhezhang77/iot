@@ -4,6 +4,7 @@
   "id": "1a438b7092",
   "name": "grovepi_102",
   "type": "grovepi",
+  "button": 3
   "lcd": 0,
   "display": "66321288b3"
 }

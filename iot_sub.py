@@ -9,20 +9,21 @@ import threading
 import re
 import signal
 
-from sense_hat import SenseHat
+from sense_hat import SenseHat, ACTION_RELEASED
 
 from grovepi import *
 from grove_rgb_lcd import *
 
 config_file = 'iot_sub.conf'
-disp_data={}
+disp_data = {}
+disp_type = 0
 running = True
 
 def handle_exit(signal, frame):
     global running
     print 'Ctrl+C pressed'
     running = False
-    
+
 def init():
     conf_str = open(config_file).read()
     return json.loads(conf_str)
@@ -56,11 +57,29 @@ def on_message(client, userdata, msg):
 def on_log(client, userdata, level, buf):
     print('Debug %d: %s'%(level, buf))
 
+def inc_disp_type(event):
+    global disp_type
+    if event.action != ACTION_RELEASED:
+        disp_type = disp_type + 1
+        
+color_table=[
+    [255,0,0],
+    [0,255,0],
+    [0,0,255],
+    [255,255,0],
+    [255,0,255],
+    [0,255,255],
+    [255,255,255]]
+
 def sense_display_info(sense):
     global disp_data
-
+    global disp_type
+    globale color_table
+    
     while True:
+        # Rotation check
         x, y, z = sense.get_accelerometer_raw().values()
+        
         x = round(x, 0)
         y = round(y, 0)
         if x == -1:
@@ -71,25 +90,38 @@ def sense_display_info(sense):
             sense.set_rotation(270)
         else:
             sense.set_rotation(0)
+            
+        if (len(disp_data) > 0):
+            if (disp_type >= len(disp_data)):
+                disp_type = 0
 
-        for [name, value] in disp_data.items():
-            sense.show_message(name+':'+value+' ', text_colour=[0,255,0])
+            name = disp_data.keys()[disp_type]
+            value = disp_data[name]
+            sense.show_message(name+':'+value, text_colour=color_table[disp_type % len(color_table)])
 
         time.sleep(1)
 
 def grove_display_info():
     global disp_data
+    global disp_type
     
     setText('')
-    setRGB(0,255,0)
+    setRGB(0,0,0)
     
     while True:
-        disp_str = '>>>'
-        for [name, value] in disp_data.items():
-            disp_str = disp_str + " " + name + ':' + value
-        for i in range(len(disp_str)):
-            setText_norefresh(disp_str[i:])
-            time.sleep(0.1)
+        if (len(disp_data) > 0):
+            if (disp_type >= len(disp_data)):
+                disp_type = 0
+                
+            name = disp_data.keys()[disp_type]
+            value = disp_data[name]
+            disp_str = name + ': ' value
+        else
+            disp_str = '> No data'
+        
+        setRGB(color_table[disp_type])
+        setText_norefresh(disp_str)
+        time.sleep(1)
         
 def main():
     global running
@@ -100,6 +132,11 @@ def main():
 
     if (conf['type']=='sensehat'):
         sense = SenseHat()
+        sense.stick.direction_up = inc_disp_type
+        sense.stick.direction_down = inc_disp_type
+        sense.stick.direction_left = inc_disp_type
+        sense.stick.direction_right = inc_disp_type
+        
         disp_thread = threading.Thread(target=sense_display_info, args=(sense,))    
     elif (conf['type']=='grovepi'):
         disp_thread = threading.Thread(target=grove_display_info)
@@ -126,11 +163,6 @@ def main():
 
     while running:
         client.loop()
-
-        if (conf['type']=='sensehat'):
-            for event in sense.stick.get_events():
-                if ((event.direction == 'up') or (event.direction == 'down')) and (event.action == 'released'):
-                    running = False
 
     client.disconnect()
     

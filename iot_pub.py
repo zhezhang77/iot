@@ -115,8 +115,8 @@ def main():
             
             eventList = sense.stick.get_events()
             for event in eventList[::-1]:
-                if (event.action == 'released'):
-                    publish(client, conf['id'], "button", event.direction)
+                if (event.direction == 'middle'):
+                    publish(client, conf['id'], "button", event.action)
                     break
         elif (conf['type']=='grovepi'):
             [temp,hum] = dht(conf['dht_port'], conf['dht_type'])
@@ -128,13 +128,6 @@ def main():
             publish(client, conf['id'], "button",        repr(button))
             publish(client, conf['id'], "potentiometer", repr(potentiometer))
             
- 	# Control program exit
-        if (conf['type']=='sensehat'):
-            for event in eventList:
-                #print("Event: {} {}".format(event.action, event.direction)) #debug
-                if (event.direction == 'middle') and (event.action == 'released'):
-                    running = False
-
     #Disconnect
     client.disconnect()
 
