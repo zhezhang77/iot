@@ -30,11 +30,11 @@
 * iot_pub.py  
   + Publish sensor data to AWS broker.  
   + **Topic:** 
-  ```c
+  ```sh
     iot/temperature/client_id     (GrovePi+/SenseHat)
     iot/humidity/client_id        (GrovePi+/SenseHat)
     iot/button/client_id          (GrovePi+/SenseHat)
-    iot/rotary/client_id          (GrovePi+)
+    iot/potentiometer/client_id   (GrovePi+)
     iot/pressure/client_id        (SenseHat)
     iot/compass/client_id         (SenseHat)
     ...
