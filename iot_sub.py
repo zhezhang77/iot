@@ -18,6 +18,7 @@ config_file = 'iot_sub.conf'
 disp_data = {}
 disp_type = 0
 running = True
+grove_light = 0
 
 def handle_exit(signal, frame):
     global running
@@ -74,7 +75,7 @@ color_table=[
 def sense_display_info(sense):
     global disp_data
     global disp_type
-    globale color_table
+    global color_table
     
     while True:
         # Rotation check
@@ -104,27 +105,49 @@ def sense_display_info(sense):
 def grove_display_info():
     global disp_data
     global disp_type
+    global grove_light
     
+    light_down = 0
+    
+    curr_disp_type = -1
     setText('')
     setRGB(0,0,0)
     
     while True:
+        light = analogRead(grove_light)
+        #print(light)
+        if (light < 50):
+            light_down = light_down + 1
+        else:
+            light_down = 0
+        
+        #print("light_down="+repr(light_down))
+        if (light_down == 1):
+            disp_type = disp_type + 1
+                
         if (len(disp_data) > 0):
             if (disp_type >= len(disp_data)):
                 disp_type = 0
                 
             name = disp_data.keys()[disp_type]
             value = disp_data[name]
-            disp_str = name + ': ' value
-        else
+            disp_str = name + ': ' + value
+        else:
             disp_str = '> No data'
         
-        setRGB(color_table[disp_type])
+        if (curr_disp_type != disp_type):
+            curr_disp_type = disp_type
+            setRGB(color_table[disp_type][0],
+                   color_table[disp_type][1],
+                   color_table[disp_type][2])
         setText_norefresh(disp_str)
         time.sleep(1)
         
 def main():
     global running
+    global disp_type
+    global grove_light
+    
     signal.signal(signal.SIGINT, handle_exit)
     
     # Init
@@ -139,6 +162,8 @@ def main():
         
         disp_thread = threading.Thread(target=sense_display_info, args=(sense,))    
     elif (conf['type']=='grovepi'):
+        pinMode(conf['light'],"INPUT")
+        grove_light = conf['light'] - 14
         disp_thread = threading.Thread(target=grove_display_info)
         
     disp_thread.daemon = True
@@ -163,7 +188,7 @@ def main():
 
     while running:
         client.loop()
-
+        
     client.disconnect()
     
     if (conf['type']=='sensehat'):
