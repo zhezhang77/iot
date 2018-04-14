@@ -18,7 +18,7 @@
   
 # Running
 + Use 'git clone' to get the whole folder to local
-+ Run 'set_sense.sh' or 'set_grove.sh' accroding your Pi
++ Run 'set_sense.sh' or 'set_grove.sh' accroding the type your sensor board
 + Run 'iot_pub.py' to publish data
   - The status of middle button of joystick will be published (Sense Hat)
 + Run 'iot_sub.py' to subscribe and display data
