@@ -63,7 +63,7 @@ def on_log(client, userdata, level, buf):
 def gen_payload(id, name, value):
     data = {}
     data['id'] = id
-    data['time'] = time.strftime("%Y%m%d%H%M%S", time.localtime())
+    data['time'] = time.time()
     data[name] = value
     #return "{\"id\":\"%s\", \"time\":\"%s\", \"%s\":\"%s\"}"%(id, time.strftime("%Y %m %d %H:%M:%S", time.localtime()), name, repr(value))
     return json.dumps(data)
