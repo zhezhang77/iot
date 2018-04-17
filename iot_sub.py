@@ -100,7 +100,8 @@ def sense_display_info(sense):
 			value = disp_data[name]
 			sense.show_message(name+':'+value, text_colour=color_table[disp_type % len(color_table)])
 
-		#time.sleep(1)
+		time.sleep(1)
+
 	sense.clear()
 
 # display data on grovepi
@@ -228,7 +229,7 @@ def main():
 				disp_type = disp_type + 1
 			#print("inc disp+type")
 		else:
-			pass
+			time.sleep(1)
 
 	time.sleep(1)
 
