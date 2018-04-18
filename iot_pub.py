@@ -16,7 +16,7 @@ running = True
 # Notify thread to exit when receive Ctrl-C from console
 def handle_exit(signal, frame):
 	global running
-	print 'Ctrl+C pressed'
+	print('Ctrl+C pressed')
 	running = False
 
 # read config file
