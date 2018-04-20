@@ -165,7 +165,7 @@ def main():
 			publish(client, conf['id'], "humidity",      repr(hum))
 			publish(client, conf['id'], "button",        repr(button))
 			publish(client, conf['id'], "potentiometer", repr(potentiometer))
-			time.sleep(0.3)
+			time.sleep(0.7)
 
 	# Disconnect
 	client.disconnect()
