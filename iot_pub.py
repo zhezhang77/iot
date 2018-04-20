@@ -130,7 +130,7 @@ def main():
 	elif (conf['type'] == 'grovepi'):
 		pinMode(conf['button'], "INPUT")
 		pinMode(conf['potentiometer'], "INPUT")
-		time.sleep(1)
+		grove_potentiometer = conf['potentiometer'] - 14
 
 	# Publish
 	while running:
@@ -153,19 +153,14 @@ def main():
 			time.sleep(1)
 		elif (conf['type'] == 'grovepi'):
 			[temp, hum] = dht(conf['dht_port'], conf['dht_type'])
-			[temp, hum] = dht(conf['dht_port'], conf['dht_type'])
-			time.sleep(0.1)
-			potentiometer = analogRead(conf['potentiometer'])
-			potentiometer = analogRead(conf['potentiometer'])
-			time.sleep(0.1)
+			time.sleep(1)
+			potentiometer = analogRead(grove_potentiometer)
 			button = digitalRead(conf['button'])
-			time.sleep(0.1)
 
 			publish(client, conf['id'], "temperature",   repr(temp))
 			publish(client, conf['id'], "humidity",      repr(hum))
 			publish(client, conf['id'], "button",        repr(button))
 			publish(client, conf['id'], "potentiometer", repr(potentiometer))
-			time.sleep(0.7)
 
 	# Disconnect
 	client.disconnect()
