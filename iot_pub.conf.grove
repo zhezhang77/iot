@@ -1,7 +1,7 @@
 {
   "entrypoint": "a1zd8y5etgd1ze.iot.ap-northeast-1.amazonaws.com",
   "port": 8883,
-  "id": "66321288b3",
+  "id": "7d313c8a1a",
   "name": "grovepi_101",
   "type": "grovepi",
   "dht_port": 7,

@@ -1,11 +1,11 @@
 {
   "entrypoint": "a1zd8y5etgd1ze.iot.ap-northeast-1.amazonaws.com",
   "port": 8883,
-  "id": "1a438b7092",
+  "id": "22aa338488",
   "name": "grovepi_102",
   "type": "grovepi",
   "button": 3,
   "light": 16,
   "lcd": 0,
-  "display": "66321288b3"
+  "display": "7d313c8a1a"
 }
