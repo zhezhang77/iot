@@ -153,14 +153,17 @@ def main():
 			time.sleep(1)
 		elif (conf['type'] == 'grovepi'):
 			[temp, hum] = dht(conf['dht_port'], conf['dht_type'])
+			time.sleep(0.5)
 			potentiometer = analogRead(conf['potentiometer'])
+			time.sleep(0.1)
 			button = digitalRead(conf['button'])
-			time.sleep(1)
+			time.sleep(0.1)
 
 			publish(client, conf['id'], "temperature",   repr(temp))
 			publish(client, conf['id'], "humidity",      repr(hum))
 			publish(client, conf['id'], "button",        repr(button))
 			publish(client, conf['id'], "potentiometer", repr(potentiometer))
+			time.sleep(0.3)
 
 	# Disconnect
 	client.disconnect()
