@@ -135,7 +135,6 @@ def main():
     # Publish
     while running:
         if (conf['type'] == 'sensehat'):
-            time.sleep(1)
             publish(client, conf['id'], "temperature",
                     repr(sense_get_temperature(sense)))
             publish(client, conf['id'], "humidity",
@@ -146,15 +145,19 @@ def main():
                     repr(sense_get_compass(sense)))
 
             eventList = sense.stick.get_events()
-            for event in eventList[::-1]:
-                if (event.direction == 'middle'):
+            for event in eventList[:]:
+                if (event.direction == 'middle' and
+		    (event.action == 'pressed' or
+		     event.action == 'released')):
                     publish(client, conf['id'], "button", event.action)
-                    break
-        elif (conf['type'] == 'grovepi'):
+	    time.sleep(1)
+
+	elif (conf['type'] == 'grovepi'):
             [temp, hum] = dht(conf['dht_port'], conf['dht_type'])
+	    potentiometer = analogRead(conf['potentiometer'])
             button = digitalRead(conf['button'])
             time.sleep(1)
-            potentiometer = analogRead(conf['potentiometer'])
+
             publish(client, conf['id'], "temperature",   repr(temp))
             publish(client, conf['id'], "humidity",      repr(hum))
             publish(client, conf['id'], "button",        repr(button))

@@ -226,9 +226,7 @@ def main():
     client.subscribe('iot/+/'+conf['display'])
 
     # Create message thread
-    mesg_thread = threading.Thread(target=message_loop, args=(client,))
-    mesg_thread.daemon = False
-    mesg_thread.start()
+    client.loop_start()
 
     light_trigger = 0
 
@@ -247,16 +245,15 @@ def main():
                 light_trigger = light_trigger + 1
             else:
                 light_trigger = 0
-            # print('light:'+repr(light)+' '+repr(light_trigger))
 
             if (light_trigger == 1):
                 disp_type = disp_type + 1
-            # print("inc disp+type")
         else:
             time.sleep(1)
 
-    time.sleep(1)
-
+    # Stop the loop then disconnect from broker
+    client.loop_stop()
+    client.disconnect()
 
 if __name__ == '__main__':
     main()
