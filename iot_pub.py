@@ -153,7 +153,9 @@ def main():
 			time.sleep(1)
 		elif (conf['type'] == 'grovepi'):
 			[temp, hum] = dht(conf['dht_port'], conf['dht_type'])
-			time.sleep(0.5)
+			[temp, hum] = dht(conf['dht_port'], conf['dht_type'])
+			time.sleep(0.1)
+			potentiometer = analogRead(conf['potentiometer'])
 			potentiometer = analogRead(conf['potentiometer'])
 			time.sleep(0.1)
 			button = digitalRead(conf['button'])

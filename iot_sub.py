@@ -118,7 +118,7 @@ def sense_display_info(sense):
 			value = disp_data[name]
 			sense.show_message(
 				name+':'+value,
-		text_colour=color_table[disp_type % len(color_table)])
+				text_colour=color_table[disp_type % len(color_table)])
 
 		time.sleep(1)
 
@@ -133,6 +133,10 @@ def grove_display_info():
 	global running
 	global grove_light
 
+	light_trigger = 0
+	light_normal = analogRead(grove_light)
+	light_normal = analogRead(grove_light)
+
 	curr_disp_type = -1
 	setText('>Waiting Data')
 	setRGB(255, 255, 255)
@@ -140,15 +144,16 @@ def grove_display_info():
 	while running:
 		# print('running...')
 		light = analogRead(grove_light)
-		if (light < 350):
+		light = analogRead(grove_light)
+		if (light < light_normal/2):
 			light_trigger = light_trigger + 1
 		else:
 			light_trigger = 0
 
 		if (light_trigger == 1):
 			disp_type = disp_type + 1
-		#print('light='+repr(light))
-		#print('light_trigger='+repr(light_trigger))
+
+		print('light='+repr(light)+' light_trigger='+repr(light_trigger))
 
 		if (len(disp_data) > 0):
 			if (disp_type >= len(disp_data)):
